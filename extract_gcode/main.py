@@ -3,6 +3,7 @@ import serial
 import time
 import sys
 import sqlite3
+import os
 
 class Point:
     x = 0
@@ -39,6 +40,9 @@ class Extract_gcode:
             self.ser = serial.Serial("COM4", 115200, stopbits=1, parity="N")
         except serial.SerialException as e:
             print(f"Failed to open serial port: {e}")
+
+        if os.path.exists("gcode.sqlite"):
+            os.remove("gcode.sqlite")
 
         self.conn = sqlite3.connect("gcode.sqlite")
         self.conn.execute('''
@@ -79,9 +83,9 @@ class Extract_gcode:
         with open("char_with_space.txt", "w", encoding="utf8") as file:
             file.write(str)
 
-    def remove_three_lines(self, gcode: str):
+    def remove_some_lines(self, gcode: str, num):
         lines = gcode.split('\n')
-        del lines[-3:]
+        del lines[-num:]
         gcode = '\n'.join(lines)
         return gcode
 
@@ -118,7 +122,7 @@ class Extract_gcode:
                 x_pos = round(x_pos - origin_x, 3)
                 y_pos = round(y_pos - origin_y, 3)
                 
-                print("origin_x:", origin_x, "x_pos: ", x_pos)
+                # print("origin_x:", origin_x, "x_pos: ", x_pos)
                 assert (x_pos < 25 and x_pos > -25), "x_pos error"
                 assert (y_pos < 25 and y_pos > -25), "y_pos error"
 
@@ -142,9 +146,9 @@ class Extract_gcode:
         with open("常用汉字库3500.txt", "r", encoding="utf8") as file:
             chs = file.readline()
 
-        ch_index = 0
-        for i in range(20):
-            filename = "第" + (i + 1) + "页.gcode"
+        ch_index = 1
+        for i in range(1, 21):
+            filename = "第" + str(i) + "页.gcode"
             with open(filename, "r") as file:
                 pattern_xy = r"X([+-]?\d+(\.\d+)?)Y([+-]?\d+(\.\d+)?)"
                 last_x_pos = sys.maxsize
@@ -152,8 +156,9 @@ class Extract_gcode:
                 line_index = 0
                 start_copy_index = sys.maxsize
                 gcode_obj = GcodeObj()
-
-                for line in file:
+                lines = file.readlines()
+                num_of_lines = len(lines)
+                for line in lines:
                     line_index += 1
                     if line_index >= start_copy_index:
                         gcode_obj.gcode = gcode_obj.gcode + line
@@ -164,12 +169,13 @@ class Extract_gcode:
                         # new ch
                         if x_pos - last_x_pos > 10 or last_x_pos - x_pos > 75:
                             # add current gcode_obj to database
-                            if last_x_pos != sys.maxsize:
-                                gcode_obj.gcode = self.remove_three_lines(gcode_obj.gcode)
-                                self.wash_gcode(gcode_obj)
-                                gcode_obj.ch = chs[ch_index]
-                                self.insert_gcode(gcode_obj)
-
+                            if last_x_pos == sys.maxsize:
+                                last_x_pos = x_pos
+                                continue
+                            gcode_obj.gcode = self.remove_some_lines(gcode_obj.gcode, 3)
+                            self.wash_gcode(gcode_obj)
+                            gcode_obj.ch = chs[ch_index]
+                            self.insert_gcode(gcode_obj)
                             # new gcode_obj
                             gcode_obj = GcodeObj()
                             start_copy_index = line_index
@@ -177,11 +183,17 @@ class Extract_gcode:
                             ch_index += 1
                             space_index += 1
                             # new ch line and new ch
-                            if last_x_pos - x_pos > 75:
+                            if last_x_pos != sys.maxsize and last_x_pos - x_pos > 75:
+                                assert space_index == 8 , "space_index != 8" 
                                 space_index = 0
                                 gcode_obj.gcode += line
-
                         last_x_pos = x_pos
+                    if line_index == num_of_lines and i == 20:
+                        gcode_obj.gcode = self.remove_some_lines(gcode_obj.gcode, 4)
+                        self.wash_gcode(gcode_obj)
+                        gcode_obj.ch = chs[ch_index]
+                        self.insert_gcode(gcode_obj)
+                    
                     
         
 
