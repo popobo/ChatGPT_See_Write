@@ -2,9 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSerialPort>
 #include <QTextEdit>
-#include <QTextBrowser>1
+#include <QTextBrowser>
+#include <QVBoxLayout>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,5 +18,29 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private:
+    void layoutInit();
+
+private:
+    QTextBrowser* m_receivedBrowser;
+
+    QTextEdit* m_sendEdit;
+
+    QPushButton* m_serialButton;
+
+    QPushButton* m_sendButton;
+
+    /* vertical layout */
+    QVBoxLayout* m_vboxLayout;
+
+    /* grid layout */
+    QGridLayout *m_gridLayout;
+
+    /* main widget */
+    QWidget *m_mainWidget;
+
+    /* func widget */
+    QWidget *m_funcWidget;
 };
 #endif // MAINWINDOW_H
