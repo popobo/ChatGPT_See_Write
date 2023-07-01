@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     moduleInit();
 
     connect(m_serialButton, &QPushButton::clicked, this, &MainWindow::openCloseSerial);
+    connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::serialWrite);
 }
 
 MainWindow::~MainWindow()
@@ -28,13 +29,13 @@ void MainWindow::layoutInit()
 #endif
 
     m_receivedBrowser = new QTextBrowser(this);
-    m_sendEdit = new QTextEdit(this);
-    m_sendButton = new QPushButton(this);
-    m_serialButton = new QPushButton(this);
-    m_vboxLayout = new QVBoxLayout(this);
-    m_gridLayout = new QGridLayout(this);
-    m_funcWidget = new QWidget(this);
-    m_mainWidget = new QWidget(this);
+    m_sendEdit = new QTextEdit();
+    m_sendButton = new QPushButton();
+    m_serialButton = new QPushButton();
+    m_vboxLayout = new QVBoxLayout();
+    m_gridLayout = new QGridLayout();
+    m_funcWidget = new QWidget();
+    m_mainWidget = new QWidget();
 
     m_sendButton->setText("send data");
     m_sendButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -58,12 +59,11 @@ void MainWindow::layoutInit()
 
 void MainWindow::moduleInit()
 {
-    m_serialPort = new SerialPort(this);
+    m_serialPort.reset(new SerialPort());
 }
 
 void MainWindow::openCloseSerial()
 {
-    assert(m_serialPort != nullptr);
     if (!m_serialPort->isOpen())
     {
         if (m_serialPort->open())
@@ -82,4 +82,9 @@ void MainWindow::openCloseSerial()
         m_serialPort->close();
         m_serialButton->setText("serial not opened");
     }
+}
+
+void MainWindow::serialWrite()
+{
+    m_serialPort->write(m_sendEdit->toPlainText());
 }

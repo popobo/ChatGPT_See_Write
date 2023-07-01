@@ -46,9 +46,11 @@ private:
     /* func widget */
     QWidget *m_funcWidget;
 
-    SerialPort* m_serialPort;
+    QScopedPointer<SerialPort> m_serialPort;
 
 private slots:
     void openCloseSerial();
+
+    void serialWrite();
 };
 #endif // MAINWINDOW_H

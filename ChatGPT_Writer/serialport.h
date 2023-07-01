@@ -12,7 +12,7 @@ class SerialPort: public QObject
     Q_OBJECT
 
 public:
-    SerialPort(QObject* parent = nullptr);
+    SerialPort();
 
     void write(QString data);
 

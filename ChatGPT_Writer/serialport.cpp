@@ -1,13 +1,14 @@
 #include "serialport.h"
 #include <QDebug>
 
-constexpr int32_t INTERVAL_TIME = 25;
+static const int32_t INTERVAL_TIME = 25;
+static const char* PORT_NAME = "/dev/ttyUSB0";
 
-SerialPort::SerialPort(QObject* parent): QObject(parent)
+SerialPort::SerialPort()
 {
     m_serialPort = new QSerialPort(this);
 
-    m_serialPort->setPortName("/dev/ttyUSB0");
+    m_serialPort->setPortName(PORT_NAME);
     m_serialPort->setBaudRate(QSerialPort::Baud115200);
     m_serialPort->setDataBits(QSerialPort::Data8);
     m_serialPort->setParity(QSerialPort::NoParity);
@@ -46,6 +47,7 @@ void SerialPort::handleData(QString data)
 {
     QStringList strList = data.split('\n');
     foreach (QString str, strList) {
+        qDebug() << str;
         str += "\n";
         if (m_serialPort)
         {
