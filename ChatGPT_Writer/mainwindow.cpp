@@ -6,6 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     layoutInit();
+
+    moduleInit();
+
+    connect(m_serialButton, &QPushButton::clicked, this, &MainWindow::openCloseSerial);
 }
 
 MainWindow::~MainWindow()
@@ -33,14 +37,11 @@ void MainWindow::layoutInit()
     m_mainWidget = new QWidget(this);
 
     m_sendButton->setText("send data");
-    m_sendButton->setMinimumSize(80, 30);
     m_sendButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_sendButton->setEnabled(false);
 
-    m_serialButton->setText("reset serial");
-    m_serialButton->setMinimumSize(80, 30);
+    m_serialButton->setText("serial not opened");
     m_serialButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_serialButton->setEnabled(false);
 
     m_gridLayout->addWidget(m_sendButton, 0, 1);
     m_gridLayout->addWidget(m_serialButton, 0, 2);
@@ -53,4 +54,32 @@ void MainWindow::layoutInit()
     m_mainWidget->setLayout(m_vboxLayout);
 
     this->setCentralWidget(m_mainWidget);
+}
+
+void MainWindow::moduleInit()
+{
+    m_serialPort = new SerialPort(this);
+}
+
+void MainWindow::openCloseSerial()
+{
+    assert(m_serialPort != nullptr);
+    if (!m_serialPort->isOpen())
+    {
+        if (m_serialPort->open())
+        {
+            m_serialButton->setEnabled(true);
+            m_serialButton->setText("serial opened");
+        }
+        else
+        {
+            m_serialButton->setText("serial error, may be ocupied");
+        }
+    }
+    else
+    {
+        m_serialButton->setEnabled(false);
+        m_serialPort->close();
+        m_serialButton->setText("serial not opened");
+    }
 }
