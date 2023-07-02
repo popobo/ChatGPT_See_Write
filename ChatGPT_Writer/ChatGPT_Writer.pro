@@ -35,4 +35,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    ChatGPT_Writer_Database.qrc
+    ChatGPT_Writer_Resource.qrc

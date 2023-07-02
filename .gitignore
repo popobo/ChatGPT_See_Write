@@ -17,5 +17,6 @@
 !*.pro
 !*.ui
 !gcode.sqlite
+!*.qrc
 
 build*/
