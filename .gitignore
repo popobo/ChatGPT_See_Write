@@ -16,5 +16,6 @@
 !note.md
 !*.pro
 !*.ui
+!gcode.sqlite
 
 build*/
