@@ -6,7 +6,7 @@ static const char* PORT_NAME = "/dev/ttyUSB0";
 
 SerialPort::SerialPort()
 {
-    m_serialPort = new QSerialPort(this);
+    m_serialPort.reset(new QSerialPort());
 
     m_serialPort->setPortName(PORT_NAME);
     m_serialPort->setBaudRate(QSerialPort::Baud115200);
@@ -19,6 +19,7 @@ SerialPort::SerialPort()
     connect(m_serialThread, &QThread::finished, m_serialThread, &QObject::deleteLater);
     connect(this, &SerialPort::dataReady, this, &SerialPort::handleData);
     this->moveToThread(m_serialThread);
+    m_serialThread->start();
 }
 
 void SerialPort::write(QString data)

@@ -29,7 +29,7 @@ private slots:
     void handleData(QString data);
 
 private:
-    QSerialPort* m_serialPort;
+    QScopedPointer<QSerialPort> m_serialPort;
 
     QThread* m_serialThread;
 };

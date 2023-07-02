@@ -70,6 +70,7 @@ void MainWindow::openCloseSerial()
         {
             m_serialButton->setEnabled(true);
             m_serialButton->setText("serial opened");
+            m_sendButton->setEnabled(true);
         }
         else
         {
@@ -78,9 +79,9 @@ void MainWindow::openCloseSerial()
     }
     else
     {
-        m_serialButton->setEnabled(false);
         m_serialPort->close();
         m_serialButton->setText("serial not opened");
+        m_sendButton->setEnabled(false);
     }
 }
 
