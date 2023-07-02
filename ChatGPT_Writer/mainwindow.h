@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include "serialport.h"
+#include "gcodegenerator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -47,6 +48,8 @@ private:
     QWidget *m_funcWidget;
 
     QScopedPointer<SerialPort> m_serialPort;
+
+    QScopedPointer<GcodeGenerator> m_gcodeGenerator;
 
 private slots:
     void openCloseSerial();

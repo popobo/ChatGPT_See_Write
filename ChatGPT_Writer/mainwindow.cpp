@@ -60,6 +60,7 @@ void MainWindow::layoutInit()
 void MainWindow::moduleInit()
 {
     m_serialPort.reset(new SerialPort());
+    m_gcodeGenerator.reset(new GcodeGenerator());
 }
 
 void MainWindow::openCloseSerial()
