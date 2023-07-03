@@ -54,6 +54,6 @@ private:
 private slots:
     void openCloseSerial();
 
-    void serialWrite();
+    void sendData();
 };
 #endif // MAINWINDOW_H

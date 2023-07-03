@@ -3,13 +3,14 @@
 static const char* db_resource_path = ":/gcode_database/gcode.sqlite";
 static const char* db_temp_name = "/gcode.sqlite";
 
-GcodeGenerator::GcodeGenerator(): m_db(QSqlDatabase::addDatabase("QSQLITE")),
-                                  m_thread(new QThread())
+GcodeGenerator::GcodeGenerator(): m_thread(new QThread())
 {
     m_thread->start();
     this->moveToThread(m_thread);
+
     connect(m_thread, &QThread::finished, m_thread, &QObject::deleteLater);
     connect(this, &GcodeGenerator::signalInitDb, this, &GcodeGenerator::slotInitDb);
+    connect(this, &GcodeGenerator::signalDataReady, this, &GcodeGenerator::slotHandleData);
 
     emit signalInitDb();
 }
@@ -24,8 +25,14 @@ bool GcodeGenerator::isDbOpen()
     return m_db.isOpen();
 }
 
+void GcodeGenerator::sendData(const QString &data)
+{
+    emit signalDataReady(data);
+}
+
 void GcodeGenerator::slotInitDb()
 {
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
     QFile dbFile(db_resource_path);
     if (!dbFile.open(QIODevice::ReadOnly))
     {
@@ -36,7 +43,7 @@ void GcodeGenerator::slotInitDb()
 
     QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + db_temp_name;
     QFile tempFile(tempPath);
-    if (tempFile.exists() || !tempFile.open(QIODevice::WriteOnly))
+    if (!tempFile.open(QIODevice::WriteOnly))
     {
         qDebug() << "Error creating temprory file!";
         assert(false);
@@ -52,5 +59,29 @@ void GcodeGenerator::slotInitDb()
         qDebug() << "Error opening database: " << m_db.lastError().text();
         assert(false);
         return;
+    }
+}
+
+void GcodeGenerator::slotHandleData(const QString &data)
+{
+    QSqlQuery query;
+    query.prepare(R"(SELECT * FROM gcode WHERE ch = :ch)");
+    for (const QChar& c : data)
+    {
+        query.bindValue(":ch", c);
+        // qDebug() << query.lastQuery();
+        if (!query.exec())
+        {
+            qDebug() << "unable to find ch = " << query.lastError().text();
+            return;
+        }
+
+        if (query.next())
+        {
+            QString gcode = query.value("gcode").toString();
+            float centerX = query.value("center_x").toFloat();
+            float centerY = query.value("center_y").toFloat();
+            qDebug() << "gcode: " << gcode << " centerX: " << centerX << " centerY: " << centerY;
+        }
     }
 }

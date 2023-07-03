@@ -14,11 +14,15 @@ public:
 
     bool isDbOpen();
 
+    void sendData(const QString& data);
+
 signals:
     void signalInitDb();
+    void signalDataReady(const QString& data);
 
 private slots:
     void slotInitDb();
+    void slotHandleData(const QString& data);
 
 private:
     QSqlDatabase m_db;

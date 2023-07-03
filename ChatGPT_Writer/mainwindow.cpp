@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     moduleInit();
 
     connect(m_serialButton, &QPushButton::clicked, this, &MainWindow::openCloseSerial);
-    connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::serialWrite);
+    connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::sendData);
 }
 
 MainWindow::~MainWindow()
@@ -39,7 +39,7 @@ void MainWindow::layoutInit()
 
     m_sendButton->setText("send data");
     m_sendButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_sendButton->setEnabled(false);
+    // m_sendButton->setEnabled(false);
 
     m_serialButton->setText("serial not opened");
     m_serialButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -86,7 +86,11 @@ void MainWindow::openCloseSerial()
     }
 }
 
-void MainWindow::serialWrite()
+void MainWindow::sendData()
 {
-    m_serialPort->write(m_sendEdit->toPlainText());
+    if (!m_gcodeGenerator->isDbOpen())
+    {
+        qDebug() << "gcodeGenerator is not ready";
+    }
+    m_gcodeGenerator->sendData(m_sendEdit->toPlainText());
 }
