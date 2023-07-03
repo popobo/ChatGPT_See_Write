@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_serialButton, &QPushButton::clicked, this, &MainWindow::openCloseSerial);
     connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::sendData);
+    connect(m_serialPort.get(), &SerialPort::signalOpened, this, &MainWindow::serialOpened);
 }
 
 MainWindow::~MainWindow()
@@ -70,16 +71,7 @@ void MainWindow::openCloseSerial()
 {
     if (!m_serialPort->isOpen())
     {
-        if (m_serialPort->open())
-        {
-            m_serialButton->setEnabled(true);
-            m_serialButton->setText("serial opened");
-            m_sendButton->setEnabled(true);
-        }
-        else
-        {
-            m_serialButton->setText("serial error, may be ocupied");
-        }
+        m_serialPort->open();
     }
     else
     {
@@ -96,4 +88,18 @@ void MainWindow::sendData()
         qDebug() << "gcodeGenerator is not ready";
     }
     m_gcodeGenerator->sendData(m_sendEdit->toPlainText());
+}
+
+void MainWindow::serialOpened(bool ret)
+{
+    if (ret)
+    {
+        m_serialButton->setEnabled(true);
+        m_serialButton->setText("serial opened");
+        m_sendButton->setEnabled(true);
+    }
+    else
+    {
+        m_serialButton->setText("serial error, may be ocupied");
+    }
 }

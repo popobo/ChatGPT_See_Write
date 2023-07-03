@@ -53,7 +53,7 @@ private:
 
 private slots:
     void openCloseSerial();
-
     void sendData();
+    void serialOpened(bool ret);
 };
 #endif // MAINWINDOW_H

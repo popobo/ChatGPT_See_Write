@@ -20,14 +20,6 @@ public:
 
     void setSerialPort(const QSharedPointer<SerialPort>& serialPort);
 
-private:
-    struct Point
-    {
-        float x = 0.0;
-        float y = 0.0;
-    };
-
-
 signals:
     void signalInitDb();
     void signalDataReady(const QString& data);
@@ -38,10 +30,10 @@ private slots:
 
 private:
     QSqlDatabase m_db;
-
     QThread* m_thread;
-
     QSharedPointer<SerialPort> m_serialPort;
+    int32_t m_chLineIndex = 0;
+    int32_t m_lineIndex = 0;
 };
 
 #endif // GCODEGENERATOR_H
