@@ -1,4 +1,6 @@
 #include "gcodegenerator.h"
+#include "logger.h"
+#include "serialport.h"
 
 static const char* db_resource_path = ":/gcode_database/gcode.sqlite";
 static const char* db_temp_name = "/gcode.sqlite";
@@ -28,6 +30,11 @@ bool GcodeGenerator::isDbOpen()
 void GcodeGenerator::sendData(const QString &data)
 {
     emit signalDataReady(data);
+}
+
+void GcodeGenerator::setSerialPort(const QSharedPointer<SerialPort> &serialPort)
+{
+    m_serialPort = serialPort;
 }
 
 void GcodeGenerator::slotInitDb()
@@ -66,6 +73,11 @@ void GcodeGenerator::slotHandleData(const QString &data)
 {
     QSqlQuery query;
     query.prepare(R"(SELECT * FROM gcode WHERE ch = :ch)");
+
+    QString gcode;
+    float centerX = 0.0;
+    float centerY = 0.0;
+    QStringList strList;
     for (const QChar& c : data)
     {
         query.bindValue(":ch", c);
@@ -74,14 +86,28 @@ void GcodeGenerator::slotHandleData(const QString &data)
         {
             qDebug() << "unable to find ch = " << query.lastError().text();
             return;
-        }
-
+        }   
         if (query.next())
         {
-            QString gcode = query.value("gcode").toString();
-            float centerX = query.value("center_x").toFloat();
-            float centerY = query.value("center_y").toFloat();
-            qDebug() << "gcode: " << gcode << " centerX: " << centerX << " centerY: " << centerY;
+            gcode = query.value("gcode").toString();
+            centerX = query.value("center_x").toFloat();
+            centerY = query.value("center_y").toFloat();
+            // qDebug() << "gcode: " << gcode << " centerX: " << centerX << " centerY: " << centerY;
         }
+
+//        strList = gcode.split("\n");
+//        for (const auto& str : strList)
+//        {
+//            SPD_INFO("{0}", str.toStdString());
+
+//        }
+        assert(m_serialPort != nullptr);
+        if (!m_serialPort)
+        {
+            SPD_ERROR("m_serial is nullptr");
+            return;
+        }
+
+        m_serialPort->write(gcode);
     }
 }

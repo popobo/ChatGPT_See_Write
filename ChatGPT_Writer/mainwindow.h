@@ -47,7 +47,7 @@ private:
     /* func widget */
     QWidget *m_funcWidget;
 
-    QScopedPointer<SerialPort> m_serialPort;
+    QSharedPointer<SerialPort> m_serialPort;
 
     QScopedPointer<GcodeGenerator> m_gcodeGenerator;
 

@@ -14,7 +14,7 @@ class SerialPort: public QObject
 public:
     SerialPort();
 
-    void write(QString data);
+    void write(const QString& data);
 
     bool open();
 
@@ -23,10 +23,10 @@ public:
     bool isOpen();
 
 signals:
-    void dataReady(QString data);
+    void dataReady(const QString& data);
 
 private slots:
-    void handleData(QString data);
+    void handleData(const QString& data);
 
 private:
     QScopedPointer<QSerialPort> m_serialPort;

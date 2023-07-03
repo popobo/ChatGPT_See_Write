@@ -3,6 +3,7 @@
 
 static const int32_t INTERVAL_TIME = 25;
 static const char* PORT_NAME = "/dev/ttyUSB0";
+static const char* SET_OP = "G92 X0 Y0 Z0";
 
 SerialPort::SerialPort()
 {
@@ -22,7 +23,7 @@ SerialPort::SerialPort()
     m_serialThread->start();
 }
 
-void SerialPort::write(QString data)
+void SerialPort::write(const QString& data)
 {
     dataReady(data);
 }
@@ -44,8 +45,13 @@ bool SerialPort::isOpen()
     return m_serialPort->isOpen();
 }
 
-void SerialPort::handleData(QString data)
+void SerialPort::handleData(const QString& data)
 {
+    static bool firstTime = true;
+    if (firstTime)
+    {
+        m_serialPort->write(SET_OP);
+    }
     QStringList strList = data.split('\n');
     foreach (QString str, strList) {
         qDebug() << str;

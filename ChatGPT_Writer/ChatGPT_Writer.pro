@@ -17,12 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     gcodegenerator.cpp \
+    logger.cpp \
     main.cpp \
     mainwindow.cpp \
     serialport.cpp
 
 HEADERS += \
     gcodegenerator.h \
+    logger.h \
     mainwindow.h \
     serialport.h
 
@@ -36,3 +38,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     ChatGPT_Writer_Resource.qrc
+
+INCLUDEPATH += spdlog/

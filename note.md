@@ -15,6 +15,8 @@ source /home/root/shell/wifi/alientek_usb_wifi_setup.sh -m station -i Xiaomi_BB9
         - 结合写字机当前状态组合出正确的一段gcode
     - 输入unicode字符
     - GcodeGenerator
+        - void sendData(const QString& data)
+        
     - issues
         - when using git lfs, remember git lfs pull
         - QSqlDatabase and QSqlQuery guide, http://katecpp.github.io/sqlite-with-qt/

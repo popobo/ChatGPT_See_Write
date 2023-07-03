@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QGuiApplication>
 #include <QScreen>
+#include "logger.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -61,6 +62,8 @@ void MainWindow::moduleInit()
 {
     m_serialPort.reset(new SerialPort());
     m_gcodeGenerator.reset(new GcodeGenerator());
+    m_gcodeGenerator->setSerialPort(m_serialPort);
+    Logger::init();
 }
 
 void MainWindow::openCloseSerial()
