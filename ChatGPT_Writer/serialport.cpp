@@ -117,6 +117,7 @@ void SerialPort::handleListData(const QStringList &strList)
             {
                 char buf[BUF_SIZE];
                 auto len = m_serialPort->read(buf, BUF_SIZE);
+                buf[len] = '\0';
                 SPD_INFO("{0}", buf);
             }
             else

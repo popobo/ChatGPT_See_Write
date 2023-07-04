@@ -5,12 +5,14 @@
 static const char* DB_RESOURCE_PATH = ":/gcode_database/gcode.sqlite";
 static const char* DB_TEMP_NAME = "/gcode.sqlite";
 static int32_t MAX_CH_A_LINE = 16;
-static float DIS_BT_CHS = 10;
-static float DIS_BT_LINE = 10;
+static float DIS_BT_CHS = 7;
+static float DIS_BT_LINE = 7;
 static float DEFAULT_MIN_Z = 0.5;
 static float DEFAULT_MAX_Z = 7.0;
-static float NEW_MIN_Z = 0.5;
-static float NEW_MAX_Z = 7.0;
+static float NEW_MIN_Z = -8.0;
+static float NEW_MAX_Z = 0.5;
+static float STANDARD_CENTER_X = 2.0;
+static float STANDARD_CENTER_Y = -2.0;
 
 GcodeGenerator::GcodeGenerator(): m_thread(new QThread())
 {
@@ -80,18 +82,14 @@ void GcodeGenerator::slotHandleData(const QString &data)
 {
     QSqlQuery query;
     query.prepare(R"(SELECT * FROM gcode WHERE ch = :ch)");
-
-    QString gcode;
-    float centerX = 0.0;
-    float centerY = 0.0;
-
-    QStringList strList;
-
     QRegularExpression reXY("G0 X([-+]?[0-9]*\\.?[0-9]+)Y([-+]?[0-9]*\\.?[0-9]+)");
     QRegularExpression reZ("G1G90 Z([-+]?[0-9]*\\.?[0-9]+)F8000");
     for (const QChar& c : data)
     {
         /* get gcode of c from db */
+        QString gcode;
+        float centerX = 0.0;
+        float centerY = 0.0;
         query.bindValue(":ch", c);
         if (!query.exec())
         {
@@ -106,8 +104,12 @@ void GcodeGenerator::slotHandleData(const QString &data)
         }
 
         /* modify x, y, z and generate new gcode */
-        strList = gcode.split("\n");
+        QStringList strList = gcode.split("\n");
         QStringList newGcodeList;
+
+        float fixX = STANDARD_CENTER_X - centerX;
+        float fixY = STANDARD_CENTER_Y - centerY;
+
         for (const auto& str : strList)
         {
             auto matchXY = reXY.match(str);
@@ -116,8 +118,8 @@ void GcodeGenerator::slotHandleData(const QString &data)
             {
                 float x = matchXY.captured(1).toFloat();
                 float y = matchXY.captured(2).toFloat();
-                x += DIS_BT_CHS * m_chLineIndex;
-                y -= DIS_BT_LINE * m_lineIndex;
+                x = x + fixX + DIS_BT_CHS * m_chLineIndex;
+                y = y + fixY - DIS_BT_LINE * m_lineIndex;
 
                 newStr.sprintf("G0 X%.3fY%.3fF8000", x, y);
                 newGcodeList.append(newStr);
