@@ -20,6 +20,11 @@ public:
 
     void setSerialPort(const QSharedPointer<SerialPort>& serialPort);
 
+private:
+    void penUp();
+
+    void penDown();
+
 signals:
     void signalInitDb();
     void signalDataReady(const QString& data);

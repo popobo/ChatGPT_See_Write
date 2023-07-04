@@ -46,6 +46,20 @@ void GcodeGenerator::setSerialPort(const QSharedPointer<SerialPort> &serialPort)
     m_serialPort = serialPort;
 }
 
+void GcodeGenerator::penUp()
+{
+    QString str;
+    str.sprintf("G1G90 Z%.1fF8000", NEW_MIN_Z);
+    m_serialPort->write(str);
+}
+
+void GcodeGenerator::penDown()
+{
+    QString str;
+    str.sprintf("G1G90 Z%.3fF8000", NEW_MAX_Z);
+    m_serialPort->write(str);
+}
+
 void GcodeGenerator::slotInitDb()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -136,12 +150,13 @@ void GcodeGenerator::slotHandleData(const QString &data)
                 {
                     z = NEW_MAX_Z;
                 }
-                newStr.sprintf("G1G90 Z%.3fF8000", z);
+                newStr.sprintf("G1G90 Z%.1fF8000", z);
                 newGcodeList.append(newStr);
             }
             // SPD_INFO("newStr: {0}", newStr.toStdString());
         }
 
+        penUp();
         m_serialPort->write(newGcodeList);
 
         m_chLineIndex++;

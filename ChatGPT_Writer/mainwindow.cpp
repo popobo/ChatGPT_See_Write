@@ -56,7 +56,8 @@ void MainWindow::layoutInit()
     m_vboxLayout->addWidget(m_funcWidget, 1);
     m_mainWidget->setLayout(m_vboxLayout);
 
-    m_sendEdit->setText("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    // m_sendEdit->setText("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    m_sendEdit->setText("啊阿埃挨哎唉哀皑癌蔼矮艾碍爱隘鞍氨安俺按暗岸胺案肮昂盎凹敖熬翱袄傲奥懊");
 
     this->setCentralWidget(m_mainWidget);
 }

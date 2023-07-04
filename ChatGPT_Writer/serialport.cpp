@@ -1,11 +1,13 @@
 #include <QDebug>
 #include "serialport.h"
 #include "logger.h"
+#include <cstring>
 
 static const int32_t INTERVAL_TIME = 25;
 static const int32_t BUF_SIZE = 128;
 static const char* PORT_NAME = "/dev/ttyUSB0";
 static const char* SET_OP = "G92 X0 Y0 Z0";
+static const char* OK = "ok\r\n";
 static bool firstTime = true;
 
 SerialPort::SerialPort()
@@ -89,12 +91,27 @@ void SerialPort::handleData(const QString& data)
     QStringList strList = data.split('\n');
     foreach (QString str, strList)
     {
-        qDebug() << str;
         str += "\n";
         if (m_serialPort)
         {
+            retry:
             m_serialPort->write(str.toUtf8());
-            QThread::msleep(INTERVAL_TIME);
+            SPD_INFO("{0}", str.toStdString());
+            if (m_serialPort->waitForReadyRead(1000))
+            {
+                char buf[BUF_SIZE];
+                auto len = m_serialPort->read(buf, BUF_SIZE);
+                buf[len] = '\0';
+                SPD_INFO("{0}", buf);
+                if (strcmp(buf, OK) != 0)
+                {
+                    goto retry;
+                }
+            }
+            else
+            {
+                assert(false);
+            }
         }
     }
 }
@@ -111,6 +128,7 @@ void SerialPort::handleListData(const QStringList &strList)
         str += "\n";
         if (m_serialPort)
         {
+            retry:
             m_serialPort->write(str.toUtf8());
             SPD_INFO("{0}", str.toStdString());
             if (m_serialPort->waitForReadyRead(1000))
@@ -119,13 +137,15 @@ void SerialPort::handleListData(const QStringList &strList)
                 auto len = m_serialPort->read(buf, BUF_SIZE);
                 buf[len] = '\0';
                 SPD_INFO("{0}", buf);
+                if (strcmp(buf, OK) != 0)
+                {
+                    goto retry;
+                }
             }
             else
             {
                 assert(false);
             }
-//            m_serialPort->flush();
-//            QThread::msleep(INTERVAL_TIME);
         }
     }
 }
