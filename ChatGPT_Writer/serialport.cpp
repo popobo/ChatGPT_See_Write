@@ -3,11 +3,13 @@
 #include "logger.h"
 #include <cstring>
 
-static const int32_t INTERVAL_TIME = 25;
 static const int32_t BUF_SIZE = 128;
 static const char* PORT_NAME = "/dev/ttyUSB0";
 static const char* SET_OP = "G92 X0 Y0 Z0";
 static const char* OK = "ok\r\n";
+static const int32_t MAX_RETRY_TIMES = 10;
+static const int32_t WAIT_FOR_READ = 1000;
+
 static bool firstTime = true;
 
 SerialPort::SerialPort()
@@ -92,12 +94,13 @@ void SerialPort::handleData(const QString& data)
     foreach (QString str, strList)
     {
         str += "\n";
+        int32_t retryTimes = 0;
         if (m_serialPort)
         {
             retry:
             m_serialPort->write(str.toUtf8());
             SPD_INFO("{0}", str.toStdString());
-            if (m_serialPort->waitForReadyRead(1000))
+            if (m_serialPort->waitForReadyRead(WAIT_FOR_READ))
             {
                 char buf[BUF_SIZE];
                 auto len = m_serialPort->read(buf, BUF_SIZE);
@@ -105,7 +108,11 @@ void SerialPort::handleData(const QString& data)
                 SPD_INFO("{0}", buf);
                 if (strcmp(buf, OK) != 0)
                 {
-                    goto retry;
+                    retryTimes++;
+                    if (retryTimes < MAX_RETRY_TIMES)
+                    {
+                        goto retry;
+                    }
                 }
             }
             else
@@ -126,12 +133,13 @@ void SerialPort::handleListData(const QStringList &strList)
     foreach (QString str, strList)
     {
         str += "\n";
-        if (m_serialPort)
+        int32_t retryTimes = 0;
+        if (m_serialPorts)
         {
             retry:
             m_serialPort->write(str.toUtf8());
             SPD_INFO("{0}", str.toStdString());
-            if (m_serialPort->waitForReadyRead(1000))
+            if (m_serialPort->waitForReadyRead(WAIT_FOR_READ))
             {
                 char buf[BUF_SIZE];
                 auto len = m_serialPort->read(buf, BUF_SIZE);
@@ -139,7 +147,11 @@ void SerialPort::handleListData(const QStringList &strList)
                 SPD_INFO("{0}", buf);
                 if (strcmp(buf, OK) != 0)
                 {
-                    goto retry;
+                    retryTimes++;
+                    if (retryTimes < MAX_RETRY_TIMES)
+                    {
+                        goto retry;
+                    }
                 }
             }
             else
