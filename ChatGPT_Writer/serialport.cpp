@@ -134,7 +134,7 @@ void SerialPort::handleListData(const QStringList &strList)
     {
         str += "\n";
         int32_t retryTimes = 0;
-        if (m_serialPorts)
+        if (m_serialPort)
         {
             retry:
             m_serialPort->write(str.toUtf8());
