@@ -11,6 +11,8 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class GPTController;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -23,6 +25,11 @@ private:
     void layoutInit();
 
     void moduleInit();
+
+private slots:
+    void sendData();
+
+    void getResponse(const QString& str);
 
 private:
     QTextBrowser* m_receivedBrowser;
@@ -45,5 +52,7 @@ private:
     /* func widget */
     QWidget *m_funcWidget;
 
+private:
+    GPTController* m_gptController;
 };
 #endif // MAINWINDOW_H

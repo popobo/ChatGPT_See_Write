@@ -28,3 +28,21 @@ source /home/root/shell/wifi/alientek_usb_wifi_setup.sh -m station -i Xiaomi_BB9
     - 输入为gcode
     - 输出给写字机
     - 单独的线程
+
+# OpenAI API
+- 网络环境问题
+    - 利用clash进行http代理
+    - 将external-controller改为0.0.0.0:9090，即可通过局域网中的设备访问
+- https://github.com/olrea/openai-cpp
+    - libcurl
+        - 交叉编译出armv7
+        - https://www.jianshu.com/p/50c381b72bda
+    - 解决Qt ssl版本兼容问题
+        - https://www.howtoforge.com/tutorial/how-to-install-openssl-from-source-on-linux/
+    - curl: (60) server certificate verification failed. CAfile: /etc/ssl/certs/ca-certificates.crt CRLfile: none
+    More details here: https://curl.haxx.se/docs/sslcerts.html
+    ```c++
+    QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone); // Temporarily disable peer verification for debugging purposes
+    QSslConfiguration::setDefaultConfiguration(sslConfig);
+    ```

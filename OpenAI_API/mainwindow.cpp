@@ -1,10 +1,15 @@
+#include <QGuiApplication>
+#include <QScreen>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "gptcontroller.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     layoutInit();
+
+    moduleInit();
 }
 
 MainWindow::~MainWindow()
@@ -48,8 +53,24 @@ void MainWindow::layoutInit()
     m_vboxLayout->addWidget(m_funcWidget, 1);
     m_mainWidget->setLayout(m_vboxLayout);
 
-    // m_sendEdit->setText("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    m_sendEdit->setText("啊阿埃挨哎唉哀皑癌蔼矮艾碍爱隘鞍氨安俺按暗岸胺案肮昂盎凹敖熬翱袄傲奥懊");
-
     this->setCentralWidget(m_mainWidget);
+
+    connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::sendData);
+}
+
+void MainWindow::moduleInit()
+{
+    m_gptController = new GPTController();
+    connect(m_gptController, &GPTController::response, this, &MainWindow::getResponse);
+}
+
+void MainWindow::sendData()
+{
+    QString data = m_sendEdit->toPlainText();
+    m_gptController->request(data);
+}
+
+void MainWindow::getResponse(const QString &str)
+{
+    m_receivedBrowser->setText(str);
 }
