@@ -2,6 +2,8 @@
 #include <QGuiApplication>
 #include "logger.h"
 
+static const char* STRAR_CAMERA = ""start camera";
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -49,7 +51,7 @@ void MainWindow::layoutInit()
     m_middleWidget = new QWidget();
     m_comboBoxCameras = new QComboBox();
     m_takePhotoButton = new QPushButton();
-    m_startCameraButton = new QPushButton();
+    m_openCameraButton = new QPushButton();
     m_sendButton = new QPushButton();
     m_serialButton = new QPushButton();
     m_scrollArea = new QScrollArea();
@@ -63,7 +65,7 @@ void MainWindow::layoutInit()
     m_vboxLayoutControl->addWidget(m_photoLabel);
     m_vboxLayoutControl->addWidget(m_comboBoxCameras);
     m_vboxLayoutControl->addWidget(m_takePhotoButton);
-    m_vboxLayoutControl->addWidget(m_startCameraButton);
+    m_vboxLayoutControl->addWidget(m_openCameraButton);
     m_vboxLayoutControl->addWidget(m_sendButton);
     m_vboxLayoutControl->addWidget(m_serialButton);
 
@@ -82,7 +84,7 @@ void MainWindow::layoutInit()
     this->setCentralWidget(m_mainWidget);
 
     initButton(m_takePhotoButton, "take photo", false, 200, 40);
-    initButton(m_startCameraButton, "start camera", true, 200, 40);
+    initButton(m_openCameraButton, "start camera", true, 200, 40);
     initButton(m_sendButton, "send data", false, 200, 40);
     initButton(m_serialButton, "open serial", true, 200, 40);
 
@@ -110,8 +112,49 @@ void MainWindow::moduleInit()
 
     m_camera = new Camera();
     m_camera->moveToThread(&m_cameraThread);
+
     connect(&m_cameraThread, &QThread::finished, m_camera, &Camera::deleteLater);
+    connect(m_openCameraButton, &QPushButton::clicked, this, [=](){
+        if (!m_camera->isOpen())
+        {
+            m_camera->openCamera(m_comboBoxCameras->currentText());
+        }
+        else
+        {
+            m_camera->closeCamera();
+            m_openCameraButton->setText("start camera");
+        }
+    });
+
+    connect(m_camera, &Camera::scanCameraFin, this, &MainWindow::_scanCameraFin);
+    connect(m_camera, &Camera::readyImage, this, &MainWindow::_showImage);
+    connect(m_camera, &Camera::openCameraFin, this, [=](bool ret){
+        if (ret)
+            m_openCameraButton->setText("Camera Opened");
+        else
+            m_openCameraButton->setText("Failed to Open");
+    });
+
     m_cameraThread.start();
     m_camera->scanCamera();
     SPD_INFO("current thread is {0}", (int64_t)QThread::currentThread());
+}
+
+void MainWindow::_scanCameraFin(const QStringList &list)
+{
+    for(const auto& str: list)
+    {
+        m_comboBoxCameras->addItem(str);
+    }
+}
+
+void MainWindow::_showImage(const QImage &image)
+{
+    m_displayLabel->setPixmap(QPixmap::fromImage(image));
+    m_saveImage = image;
+
+    if (!m_saveImage.isNull())
+        m_takePhotoButton->setEnabled(true);
+    else
+        m_takePhotoButton->setEnabled(false);
 }

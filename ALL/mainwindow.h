@@ -27,6 +27,10 @@ private:
 
     void moduleInit();
 
+private slots:
+    void _scanCameraFin(const QStringList& list);
+    void _showImage(const QImage &image);
+
 private:
     /* 主容器，Widget也可以当作一种容器 */
     QWidget* m_mainWidget;
@@ -56,7 +60,7 @@ private:
 
     QPushButton* m_takePhotoButton;
 
-    QPushButton* m_startCameraButton;
+    QPushButton* m_openCameraButton;
 
     /* 拍照保存的照片 */
     QImage m_saveImage;

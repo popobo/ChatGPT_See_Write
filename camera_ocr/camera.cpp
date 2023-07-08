@@ -1,12 +1,3 @@
-/******************************************************************
-Copyright © Deng Zhimao Co., Ltd. 1990-2021. All rights reserved.
-* @projectName   05_opencv_camera
-* @brief         camera.cpp
-* @author        Deng Zhimao
-* @email         1252699831@qq.com
-* @net           www.openedv.com
-* @date          2021-03-17
-*******************************************************************/
 #include "camera.h"
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
