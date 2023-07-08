@@ -1,12 +1,3 @@
-/******************************************************************
-Copyright © Deng Zhimao Co., Ltd. 1990-2021. All rights reserved.
-* @projectName   05_opencv_camera
-* @brief         mainwindow.cpp
-* @author        Deng Zhimao
-* @email         1252699831@qq.com
-* @net           www.openedv.com
-* @date          2021-03-17
-*******************************************************************/
 #include "mainwindow.h"
 #include <QGuiApplication>
 #include <QScreen>
@@ -21,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
     /* 布局初始化 */
     layoutInit();
 
-    /* 扫描摄像头 */
     scanCameraDevice();
 }
 
@@ -148,10 +138,11 @@ void MainWindow::scanCameraDevice()
 
     file.setFileName("/dev/video2");
 
-    if (file.exists())
+    if (file.exists()){
         /* 开发板USB摄像头设备是2 */
+        qDebug() << "/dev/video2 exists";
         comboBox->addItem("video2");
-
+    }
 #if !__arm__
     /* ubuntu的USB摄像头一般是0 */
     comboBox->setCurrentIndex(0);
