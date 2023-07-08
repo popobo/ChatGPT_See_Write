@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "ocrcontroller.h"
 #include "gptcontroller.h"
+#include "serialport.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,6 +40,7 @@ private slots:
     void _sendData();
     void _orcResponseHandle(const QString& result);
     void _gptResponseHandle(const QString& result);
+    void _serialOpened(bool ret);
 
 private:
     /* 主容器，Widget也可以当作一种容器 */
@@ -88,5 +90,7 @@ private:
 
     GPTController* m_gptController = nullptr;
     QThread m_gptControllerThread;
+
+    SerialPort* m_serialPort = nullptr;
 };
 #endif // MAINWINDOW_H

@@ -145,6 +145,11 @@ void MainWindow::moduleInit()
     connect(m_gptController, &GPTController::response, this, &MainWindow::_gptResponseHandle);
 
     m_gptControllerThread.start();
+
+    m_serialPort = new SerialPort();
+
+    connect(m_serialButton, &QPushButton::clicked, m_serialPort, &SerialPort::open);
+    connect(m_serialPort, &SerialPort::opened, this, &MainWindow::_serialOpened);
 }
 
 void MainWindow::_scanCameraFin(const QStringList &list)
@@ -209,5 +214,19 @@ void MainWindow::_orcResponseHandle(const QString& result)
 void MainWindow::_gptResponseHandle(const QString& result)
 {
     m_receivedBrowser->setText(result);
+}
+
+void MainWindow::_serialOpened(bool ret)
+{
+    if (ret)
+    {
+        m_serialButton->setEnabled(true);
+        m_serialButton->setText("serial opened");
+        m_sendButton->setEnabled(true);
+    }
+    else
+    {
+        m_serialButton->setText("serial error, may be ocupied");
+    }
 }
 

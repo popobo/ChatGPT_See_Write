@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network sql serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -34,19 +34,23 @@ contains(TARGET_ARCH, arm){
 
 SOURCES += \
     camera.cpp \
+    gcodegenerator.cpp \
     gptcontroller.cpp \
     main.cpp \
     mainwindow.cpp \
     logger.cpp \
-    ocrcontroller.cpp
+    ocrcontroller.cpp \
+    serialport.cpp
 
 HEADERS += \
     camera.h \
     common_constant.h \
+    gcodegenerator.h \
     gptcontroller.h \
     mainwindow.h \
     logger.h \
-    ocrcontroller.h
+    ocrcontroller.h \
+    serialport.h
 
 INCLUDEPATH += spdlog/
 
