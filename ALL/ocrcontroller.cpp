@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QNetworkProxy>
 
 OCRController::OCRController(QObject *parent) : QObject(parent)
 {
@@ -44,7 +45,7 @@ QString OCRController::parseResponse(const QByteArray &byteArray)
     QJsonArray resultArray = responseObject.value("words_result").toArray();
     if (resultArray.isEmpty())
     {
-        qDebug() << "Choices array is empty.";
+        qDebug() << "words_result array is empty.";
         return result;
     }
     for (const auto& val: resultArray)
@@ -63,6 +64,7 @@ void OCRController::_request(const QString &imagePath)
     if (!m_manager)
     {
         SPD_ERROR("m_manager is nullptr");
+        return;
     }
     QNetworkRequest request;
     QUrl url("https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=24.eb81d508cbd45df6535c612433c2f5bc.2592000.1691303300.282335-35827675");
@@ -103,6 +105,15 @@ void OCRController::_request(const QString &imagePath)
 void OCRController::_init()
 {
     m_manager = new QNetworkAccessManager();
+
+#if __arm__
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::HttpProxy);
+    proxy.setHostName("127.0.0.1");
+    proxy.setPort(7890);
+    m_manager->setProxy(proxy);
+#endif
+
     QSslConfiguration sslConfig = QSslConfiguration::defaultConfiguration();
     sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone); // Temporarily disable peer verification for debugging purposes
     QSslConfiguration::setDefaultConfiguration(sslConfig);

@@ -34,6 +34,7 @@ contains(TARGET_ARCH, arm){
 
 SOURCES += \
     camera.cpp \
+    gptcontroller.cpp \
     main.cpp \
     mainwindow.cpp \
     logger.cpp \
@@ -42,6 +43,7 @@ SOURCES += \
 HEADERS += \
     camera.h \
     common_constant.h \
+    gptcontroller.h \
     mainwindow.h \
     logger.h \
     ocrcontroller.h

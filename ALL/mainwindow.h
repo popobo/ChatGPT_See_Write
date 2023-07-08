@@ -10,6 +10,7 @@
 #include <QTextBrowser>
 #include "camera.h"
 #include "ocrcontroller.h"
+#include "gptcontroller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,7 +37,8 @@ private slots:
     void _saveImage();
     void _saveImageFin(const QImage& saveImage);
     void _sendData();
-    void _responseHandle(const QString& result);
+    void _orcResponseHandle(const QString& result);
+    void _gptResponseHandle(const QString& result);
 
 private:
     /* 主容器，Widget也可以当作一种容器 */
@@ -83,5 +85,8 @@ private:
 
     OCRController* m_ocrController = nullptr;
     QThread m_ocrControllerThread;
+
+    GPTController* m_gptController = nullptr;
+    QThread m_gptControllerThread;
 };
 #endif // MAINWINDOW_H

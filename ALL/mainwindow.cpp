@@ -134,9 +134,17 @@ void MainWindow::moduleInit()
 
     connect(&m_ocrControllerThread, &QThread::finished, m_ocrController, &OCRController::deleteLater);
     connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::_sendData);
-    connect(m_ocrController, &OCRController::response, this, &MainWindow::_responseHandle);
+    connect(m_ocrController, &OCRController::response, this, &MainWindow::_orcResponseHandle);
 
     m_ocrControllerThread.start();
+
+    m_gptController = new GPTController();
+    m_gptController->moveToThread(&m_gptControllerThread);
+
+    connect(m_ocrController, &OCRController::response, m_gptController, &GPTController::request);
+    connect(m_gptController, &GPTController::response, this, &MainWindow::_gptResponseHandle);
+
+    m_gptControllerThread.start();
 }
 
 void MainWindow::_scanCameraFin(const QStringList &list)
@@ -193,7 +201,13 @@ void MainWindow::_sendData()
     m_ocrController->request(QCoreApplication::applicationDirPath() + "/" + IMAGE_NAME);
 }
 
-void MainWindow::_responseHandle(const QString& result)
+void MainWindow::_orcResponseHandle(const QString& result)
 {
     m_sendEdit->setText(result);
 }
+
+void MainWindow::_gptResponseHandle(const QString& result)
+{
+    m_receivedBrowser->setText(result);
+}
+
