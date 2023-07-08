@@ -17,7 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     m_cameraThread.quit();
+    m_ocrControllerThread.quit();
     m_cameraThread.wait();
+    m_ocrControllerThread.wait();
 }
 
 static void initButton(QPushButton* button, const QString& name, bool enable, int32_t maxWidth, int32_t maxHeight)
@@ -132,6 +134,7 @@ void MainWindow::moduleInit()
 
     connect(&m_ocrControllerThread, &QThread::finished, m_ocrController, &OCRController::deleteLater);
     connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::_sendData);
+    connect(m_ocrController, &OCRController::response, this, &MainWindow::_responseHandle);
 
     m_ocrControllerThread.start();
 }
@@ -188,4 +191,9 @@ void MainWindow::_saveImageFin(const QImage &saveImage)
 void MainWindow::_sendData()
 {
     m_ocrController->request(QCoreApplication::applicationDirPath() + "/" + IMAGE_NAME);
+}
+
+void MainWindow::_responseHandle(const QString& result)
+{
+    m_sendEdit->setText(result);
 }

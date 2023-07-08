@@ -36,6 +36,7 @@ private slots:
     void _saveImage();
     void _saveImageFin(const QImage& saveImage);
     void _sendData();
+    void _responseHandle(const QString& result);
 
 private:
     /* 主容器，Widget也可以当作一种容器 */

@@ -5,7 +5,6 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-
 class OCRController : public QObject
 {
     Q_OBJECT
@@ -21,6 +20,7 @@ signals:
 
 private:
     void init();
+    QString parseResponse(const QByteArray& byteArray);
 
 private slots:
     void _request(const QString& imagePath);

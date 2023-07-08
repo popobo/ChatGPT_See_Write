@@ -1,6 +1,9 @@
 #include "ocrcontroller.h"
 #include "logger.h"
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 OCRController::OCRController(QObject *parent) : QObject(parent)
 {
@@ -17,6 +20,42 @@ void OCRController::request(const QString &imagePath)
 void OCRController::init()
 {
     QMetaObject::invokeMethod(this, "_init", Qt::QueuedConnection);
+}
+
+QString OCRController::parseResponse(const QByteArray &byteArray)
+{
+    QString result;
+    QJsonDocument responseDoc = QJsonDocument::fromJson(byteArray);
+    if (responseDoc.isNull())
+    {
+        qDebug() << "Failed to parse response as JSON.";
+        return result;
+    }
+    if (!responseDoc.isObject())
+    {
+        qDebug() << "Response is not a JSON object.";
+        return result;
+    }
+    QJsonObject responseObject = responseDoc.object();
+    if (!responseObject.contains("words_result")) {
+        qDebug() << "Response does not contain the 'words_result' field.";
+        return result;
+    }
+    QJsonArray resultArray = responseObject.value("words_result").toArray();
+    if (resultArray.isEmpty())
+    {
+        qDebug() << "Choices array is empty.";
+        return result;
+    }
+    for (const auto& val: resultArray)
+    {
+        auto obj = val.toObject();
+        if (obj.contains("words"))
+        {
+            result += obj.value("words").toString();
+        }
+    }
+    return result;
 }
 
 void OCRController::_request(const QString &imagePath)
@@ -49,14 +88,14 @@ void OCRController::_request(const QString &imagePath)
         if (reply->error() == QNetworkReply::NoError) {
             // 请求成功，处理响应数据
             QByteArray response = reply->readAll();
-            QString responseStr(response);
-            qDebug() << "Response:" << responseStr;
+            // Transform the response into a JSON object
+            QString result = parseResponse(response);
+            emit this->response(result);
         } else {
             // 请求出错，处理错误信息
             qDebug() << "Error:" << reply->errorString();
         }
 
-        // 清理资源
         reply->deleteLater();
     });
 }
