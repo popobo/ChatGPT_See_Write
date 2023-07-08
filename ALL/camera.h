@@ -53,9 +53,9 @@ private:
     QStringList m_deviceList;
     QMutex m_deviceListMutex;
 
-    cv::VideoCapture* m_capture;
+    cv::VideoCapture* m_capture = nullptr;
 
-    QTimer* m_timer;
+    QTimer* m_timer = nullptr;
 
     QAtomicInt m_saveImageFlag;
 };

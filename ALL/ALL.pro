@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,13 +36,15 @@ SOURCES += \
     camera.cpp \
     main.cpp \
     mainwindow.cpp \
-    logger.cpp
+    logger.cpp \
+    ocrcontroller.cpp
 
 HEADERS += \
     camera.h \
     common_constant.h \
     mainwindow.h \
-    logger.h
+    logger.h \
+    ocrcontroller.h
 
 INCLUDEPATH += spdlog/
 

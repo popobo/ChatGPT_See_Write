@@ -9,6 +9,7 @@
 #include <QScrollArea>
 #include <QTextBrowser>
 #include "camera.h"
+#include "ocrcontroller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,6 +35,7 @@ private slots:
     void _openCameraFin(bool ret);
     void _saveImage();
     void _saveImageFin(const QImage& saveImage);
+    void _sendData();
 
 private:
     /* 主容器，Widget也可以当作一种容器 */
@@ -75,8 +77,10 @@ private:
     QPushButton* m_sendButton;
 
 private:
-    Camera* m_camera;
+    Camera* m_camera = nullptr;
     QThread m_cameraThread;
 
+    OCRController* m_ocrController = nullptr;
+    QThread m_ocrControllerThread;
 };
 #endif // MAINWINDOW_H

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
-#include <QGuiApplication>
 #include "logger.h"
+#include "common_constant.h"
+#include <QGuiApplication>
 #include <QScreen>
 
 static const char* STRAR_CAMERA = "start camera";
@@ -84,9 +85,9 @@ void MainWindow::layoutInit()
 
     this->setCentralWidget(m_mainWidget);
 
-    initButton(m_saveImageButton, "take photo", false, 200, 40);
+    initButton(m_saveImageButton, "save image", false, 200, 40);
     initButton(m_openCameraButton, STRAR_CAMERA, true, 200, 40);
-    initButton(m_sendButton, "send data", false, 200, 40);
+    initButton(m_sendButton, "send data", true, 200, 40);
     initButton(m_serialButton, "open serial", true, 200, 40);
 
     m_comboBoxCameras->setMaximumHeight(40);
@@ -116,7 +117,6 @@ void MainWindow::moduleInit()
 
     connect(&m_cameraThread, &QThread::finished, m_camera, &Camera::deleteLater);
     connect(m_openCameraButton, &QPushButton::clicked, this, &MainWindow::_openCamera);
-
     connect(m_camera, &Camera::scanCameraFin, this, &MainWindow::_scanCameraFin);
     connect(m_camera, &Camera::readyImage, this, &MainWindow::_showImage);
     connect(m_camera, &Camera::openCameraFin, this, &MainWindow::_openCameraFin);
@@ -125,7 +125,15 @@ void MainWindow::moduleInit()
 
     m_cameraThread.start();
     m_camera->scanCamera();
-    SPD_INFO("current thread is {0}", (int64_t)QThread::currentThread());
+
+
+    m_ocrController = new OCRController();
+    m_ocrController->moveToThread(&m_ocrControllerThread);
+
+    connect(&m_ocrControllerThread, &QThread::finished, m_ocrController, &OCRController::deleteLater);
+    connect(m_sendButton, &QPushButton::clicked, this, &MainWindow::_sendData);
+
+    m_ocrControllerThread.start();
 }
 
 void MainWindow::_scanCameraFin(const QStringList &list)
@@ -175,4 +183,9 @@ void MainWindow::_saveImage()
 void MainWindow::_saveImageFin(const QImage &saveImage)
 {
     m_photoLabel->setPixmap(QPixmap::fromImage(saveImage));
+}
+
+void MainWindow::_sendData()
+{
+    m_ocrController->request(QCoreApplication::applicationDirPath() + "/" + IMAGE_NAME);
 }
