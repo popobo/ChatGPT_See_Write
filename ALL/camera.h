@@ -29,8 +29,12 @@ public:
 
     bool isOpen();
 
+    void saveImage();
+
 private:
     QImage matToQImage(const cv::Mat&);
+
+    void saveImageToLocal(const QImage& saveImage);
 
 private slots:
     void _scanCamera();
@@ -43,6 +47,7 @@ signals:
     void scanCameraFin(QStringList list);
     void readyImage(const QImage&);
     void openCameraFin(bool ret);
+    void saveImageFin(const QImage& image);
 
 private:
     QStringList m_deviceList;
@@ -51,6 +56,8 @@ private:
     cv::VideoCapture* m_capture;
 
     QTimer* m_timer;
+
+    QAtomicInt m_saveImageFlag;
 };
 
 #endif // CAMERA_H

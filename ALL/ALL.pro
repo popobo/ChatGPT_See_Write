@@ -40,6 +40,7 @@ SOURCES += \
 
 HEADERS += \
     camera.h \
+    common_constant.h \
     mainwindow.h \
     logger.h
 

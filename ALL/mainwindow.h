@@ -30,6 +30,10 @@ private:
 private slots:
     void _scanCameraFin(const QStringList& list);
     void _showImage(const QImage &image);
+    void _openCamera();
+    void _openCameraFin(bool ret);
+    void _saveImage();
+    void _saveImageFin(const QImage& saveImage);
 
 private:
     /* 主容器，Widget也可以当作一种容器 */
@@ -58,12 +62,9 @@ private:
     /* 界面右侧区域摄像头设备下拉选择框 */
     QComboBox* m_comboBoxCameras;
 
-    QPushButton* m_takePhotoButton;
+    QPushButton* m_saveImageButton;
 
     QPushButton* m_openCameraButton;
-
-    /* 拍照保存的照片 */
-    QImage m_saveImage;
 
     QTextBrowser* m_receivedBrowser;
 
