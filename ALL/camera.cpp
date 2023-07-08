@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "common_constant.h"
 
 static const qint32 FIR_AV_CA = 0;
 static const qint32 MAX_CAMERAS = 3;
@@ -147,13 +148,15 @@ QImage Camera::matToQImage(const cv::Mat &img)
         QImage qImage(pimg, img.cols, img.rows, img.step,
                       QImage::Format_RGB888);
 
+        qImage = qImage.rgbSwapped();
+
         if (m_saveImageFlag.load() == SAVE_IMAGE_FLAG)
         {
             saveImageToLocal(qImage);
             m_saveImageFlag.store(SAVE_IMAGE_FLAG_INIT);
         }
 
-        return qImage.rgbSwapped();
+        return qImage;
     }
 
     return QImage();
@@ -161,10 +164,9 @@ QImage Camera::matToQImage(const cv::Mat &img)
 
 void Camera::saveImageToLocal(const QImage& saveImage)
 {
-    /* 判断图像是否为空 */
     if (!saveImage.isNull()) {
         QString fileName =
-                QCoreApplication::applicationDirPath() + "/test.png";
+                QCoreApplication::applicationDirPath() + "/" + IMAGE_NAME;
         SPD_INFO("saving image {0}", fileName.toStdString());
 
         saveImage.save(fileName, "PNG", -1);
