@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QTextBrowser>
+#include "camera.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +24,8 @@ public:
 
 private:
     void layoutInit();
+
+    void moduleInit();
 
 private:
     /* 主容器，Widget也可以当作一种容器 */
@@ -65,5 +68,10 @@ private:
     QPushButton* m_serialButton;
 
     QPushButton* m_sendButton;
+
+private:
+    Camera* m_camera;
+    QThread m_cameraThread;
+
 };
 #endif // MAINWINDOW_H

@@ -1,14 +1,19 @@
 #include "mainwindow.h"
 #include <QGuiApplication>
+#include "logger.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     layoutInit();
+
+    moduleInit();
 }
 
 MainWindow::~MainWindow()
 {
+    m_cameraThread.quit();
+    m_cameraThread.wait();
 }
 
 static void initButton(QPushButton* button, const QString& name, bool enable, int32_t maxWidth, int32_t maxHeight)
@@ -84,7 +89,7 @@ void MainWindow::layoutInit()
     m_comboBoxCameras->setMaximumHeight(40);
     m_comboBoxCameras->setMaximumWidth(200);
     m_photoLabel->setMaximumSize(100, 75);
-    m_scrollArea->setMinimumWidth(this->width()- m_rightWidget->width() - m_middleWidget->width());
+    // m_scrollArea->setMinimumWidth(this->width()- m_rightWidget->width() - m_middleWidget->width());
 
     /* 显示图像最大画面为xx */
     m_displayLabel->setMinimumWidth(m_scrollArea->width() * 0.75);
@@ -97,4 +102,16 @@ void MainWindow::layoutInit()
     /* 自动拉伸 */
     m_photoLabel->setScaledContents(true);
     m_displayLabel->setScaledContents(true);
+}
+
+void MainWindow::moduleInit()
+{
+    Logger::init();
+
+    m_camera = new Camera();
+    m_camera->moveToThread(&m_cameraThread);
+    connect(&m_cameraThread, &QThread::finished, m_camera, &Camera::deleteLater);
+    m_cameraThread.start();
+    m_camera->scanCamera();
+    SPD_INFO("current thread is {0}", (int64_t)QThread::currentThread());
 }
