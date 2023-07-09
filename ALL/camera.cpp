@@ -7,7 +7,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "common_constant.h"
 
-static const qint32 FIR_AV_CA = 0;
+static const qint32 FIR_AV_CA = 2;
 static const qint32 MAX_CAMERAS = 3;
 static const qint32 FRAME_RATE = 5;
 

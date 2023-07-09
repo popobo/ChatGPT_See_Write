@@ -11,6 +11,8 @@ class VideoCapture;
 class Mat;
 }
 
+static qint32 DEFAULT_CAMERA_INDEX = 2;
+
 class Camera : public QObject
 {
     Q_OBJECT
@@ -21,7 +23,7 @@ public:
 
     void scanCamera();
 
-    void openCamera(qint32 index);
+    void openCamera(qint32 index = DEFAULT_CAMERA_INDEX);
 
     void openCamera(const QString& device);
 

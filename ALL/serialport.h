@@ -24,19 +24,17 @@ public:
 
     bool isOpen();
 
-    void write(const QString& data);
-
-    void write(const QStringList& strList);
-
 signals:
     void opened(bool result);
+
+public slots:
+    void handleData(const QString& data);
+    void handleListData(const QStringList& strList);
 
 private slots:
     void _close();
     void _open();
     void _init();
-    void _handleData(const QString& data);
-    void _handleListData(const QStringList& strList);
 
 private:
     QScopedPointer<QSerialPort> m_serialPort;

@@ -6,7 +6,7 @@
 #include <QJsonObject>
 #include <QNetworkProxy>
 
-static const char* KEY = "Bearer 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";
+static const char* KEY = "Bearer ";
 
 GPTController::GPTController(QObject *parent) : QObject(parent)
 {
@@ -85,7 +85,7 @@ void GPTController::_request(const QString &req)
     QJsonObject requestBody;
     requestBody["model"] = "text-davinci-003";
     requestBody["prompt"] = req;
-    requestBody["max_tokens"] = 100;
+    requestBody["max_tokens"] = 400;
     requestBody["temperature"] = 0;
 
     QJsonDocument requestDoc(requestBody);

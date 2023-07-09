@@ -67,6 +67,12 @@ void MainWindow::layoutInit()
     m_vboxLayoutControl = new QVBoxLayout();
     m_vboxLayoutText = new QVBoxLayout();
     m_hboxLayoutMain = new QHBoxLayout();
+    m_directionWdiget = new DirectionWidget();
+    m_penUpButton = new QPushButton("up");
+    m_penDownButton = new QPushButton("down");
+    m_penWidget = new QWidget();
+    m_hLayoutPen = new QHBoxLayout();
+    m_setOPButton = new QPushButton("set origin");
 
     m_vboxLayoutControl->addWidget(m_photoLabel);
     m_vboxLayoutControl->addWidget(m_comboBoxCameras);
@@ -74,6 +80,12 @@ void MainWindow::layoutInit()
     m_vboxLayoutControl->addWidget(m_openCameraButton);
     m_vboxLayoutControl->addWidget(m_sendButton);
     m_vboxLayoutControl->addWidget(m_serialButton);
+    m_vboxLayoutControl->addWidget(m_directionWdiget);
+    m_vboxLayoutControl->addWidget(m_setOPButton);
+    m_hLayoutPen->addWidget(m_penUpButton);
+    m_hLayoutPen->addWidget(m_penDownButton);
+    m_penWidget->setLayout(m_hLayoutPen);
+    m_vboxLayoutControl->addWidget(m_penWidget);
 
     m_rightWidget->setLayout(m_vboxLayoutControl);
 
@@ -140,6 +152,7 @@ void MainWindow::moduleInit()
 
     m_ocrControllerThread.start();
 
+
     m_gptController = new GPTController();
     m_gptController->moveToThread(&m_gptControllerThread);
 
@@ -148,14 +161,59 @@ void MainWindow::moduleInit()
 
     m_gptControllerThread.start();
 
-    m_gcodeGenerator.reset(new GcodeGenerator());
-    connect(m_gptController, &GPTController::response, m_gcodeGenerator.get(), &GcodeGenerator::sendData);
 
     m_serialPort.reset(new SerialPort());
     connect(m_serialButton, &QPushButton::clicked, m_serialPort.get(), &SerialPort::open);
     connect(m_serialPort.get(), &SerialPort::opened, this, &MainWindow::_serialOpened);
 
-    m_gcodeGenerator->setSerialPort(m_serialPort);
+
+    initGcodeGenerator();
+
+
+    connect(m_gcodeGenerator.get(), &GcodeGenerator::gcodeReady, m_serialPort.get(), &SerialPort::handleData);
+    connect(m_gcodeGenerator.get(), &GcodeGenerator::gcodeListReady, m_serialPort.get(), &SerialPort::handleListData);
+}
+
+void MainWindow::initGcodeGenerator()
+{
+    m_gcodeGenerator.reset(new GcodeGenerator());
+
+    connect(m_gptController, &GPTController::response, m_gcodeGenerator.get(), &GcodeGenerator::sendData);
+    connect(m_directionWdiget->forwardButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->yMoveForward();
+    });
+    connect(m_directionWdiget->backwardButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->yMoveBackwards();
+    });
+    connect(m_directionWdiget->rightButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->xMoveRight();
+    });
+    connect(m_directionWdiget->leftButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->xMoveLeft();
+    });
+    connect(m_penUpButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->penUp();
+    });
+    connect(m_penDownButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->penDown();
+    });
+    connect(m_setOPButton, &QPushButton::clicked, this, [=](){
+        if (!m_gcodeGenerator)
+            return;
+        m_gcodeGenerator->setOriginPoint();
+    });
 }
 
 void MainWindow::_scanCameraFin(const QStringList &list)
@@ -180,7 +238,7 @@ void MainWindow::_openCamera()
 {
     if (!m_camera->isOpen())
     {
-        m_camera->openCamera(m_comboBoxCameras->currentIndex());
+        m_camera->openCamera(2);
     }
     else
     {

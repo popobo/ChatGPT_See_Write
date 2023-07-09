@@ -13,6 +13,7 @@
 #include "gptcontroller.h"
 #include "serialport.h"
 #include "gcodegenerator.h"
+#include "directionwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,6 +31,8 @@ private:
     void layoutInit();
 
     void moduleInit();
+
+    void initGcodeGenerator();
 
 private slots:
     void _scanCameraFin(const QStringList& list);
@@ -82,6 +85,15 @@ private:
 
     QPushButton* m_sendButton;
 
+    DirectionWidget* m_directionWdiget;
+
+    QPushButton* m_penUpButton;
+    QPushButton* m_penDownButton;
+    QWidget* m_penWidget;
+    QHBoxLayout* m_hLayoutPen;
+
+    QPushButton* m_setOPButton;
+
 private:
     Camera* m_camera = nullptr;
     QThread m_cameraThread;
@@ -92,7 +104,7 @@ private:
     GPTController* m_gptController = nullptr;
     QThread m_gptControllerThread;
 
-    QSharedPointer<SerialPort> m_serialPort;
+    QScopedPointer<SerialPort> m_serialPort;
     QScopedPointer<GcodeGenerator> m_gcodeGenerator;
 };
 #endif // MAINWINDOW_H

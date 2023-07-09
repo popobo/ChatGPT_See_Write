@@ -34,6 +34,7 @@ contains(TARGET_ARCH, arm){
 
 SOURCES += \
     camera.cpp \
+    directionwidget.cpp \
     gcodegenerator.cpp \
     gptcontroller.cpp \
     main.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
 HEADERS += \
     camera.h \
     common_constant.h \
+    directionwidget.h \
     gcodegenerator.h \
     gptcontroller.h \
     mainwindow.h \

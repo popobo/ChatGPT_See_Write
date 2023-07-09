@@ -5,7 +5,6 @@
 
 static const int32_t BUF_SIZE = 128;
 static const char* PORT_NAME = "/dev/ttyUSB0";
-static const char* SET_OP = "G92 X0 Y0 Z0";
 static const char* OK = "ok\r\n";
 static const int32_t MAX_RETRY_TIMES = 10;
 static const int32_t WAIT_FOR_READ = 1000;
@@ -28,16 +27,6 @@ SerialPort::~SerialPort()
 void SerialPort::init()
 {
     QMetaObject::invokeMethod(this, "_init", Qt::QueuedConnection);
-}
-
-void SerialPort::write(const QString& data)
-{
-    QMetaObject::invokeMethod(this, "_handleData", Qt::QueuedConnection, Q_ARG(QString, data));
-}
-
-void SerialPort::write(const QStringList &strList)
-{
-    QMetaObject::invokeMethod(this, "_handleListData", Qt::QueuedConnection, Q_ARG(QStringList, strList));
 }
 
 void SerialPort::_init()
@@ -86,13 +75,8 @@ bool SerialPort::isOpen()
     return m_serialPort->isOpen();
 }
 
-void SerialPort::_handleData(const QString& data)
+void SerialPort::handleData(const QString& data)
 {
-
-    if (firstTime)
-    {
-        m_serialPort->write(SET_OP);
-    }
     QStringList strList = data.split('\n');
     foreach (QString str, strList)
     {
@@ -118,21 +102,12 @@ void SerialPort::_handleData(const QString& data)
                     }
                 }
             }
-            else
-            {
-                assert(false);
-            }
         }
     }
 }
 
-void SerialPort::_handleListData(const QStringList &strList)
+void SerialPort::handleListData(const QStringList &strList)
 {
-    if (firstTime)
-    {
-        m_serialPort->write(SET_OP);
-    }
-
     foreach (QString str, strList)
     {
         str += "\n";
@@ -156,10 +131,6 @@ void SerialPort::_handleListData(const QStringList &strList)
                         goto retry;
                     }
                 }
-            }
-            else
-            {
-                assert(false);
             }
         }
     }

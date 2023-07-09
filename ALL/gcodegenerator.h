@@ -32,6 +32,8 @@ public:
 
     void yMoveBackwards(float value = 2.5);
 
+    void setOriginPoint();
+
 private:
 
     void initDb();
@@ -40,10 +42,13 @@ private slots:
     void _initDb();
     void _handleData(const QString& data);
 
+signals:
+    void gcodeReady(const QString& str);
+    void gcodeListReady(const QStringList& strList);
+
 private:
     QSqlDatabase m_db;
     QThread m_thread;
-    QSharedPointer<SerialPort> m_serialPort;
     int32_t m_chLineIndex = 0;
     int32_t m_lineIndex = 0;
 };

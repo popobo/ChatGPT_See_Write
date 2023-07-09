@@ -5,8 +5,8 @@
 static const char* DB_RESOURCE_PATH = ":/gcode_database/gcode.sqlite";
 static const char* DB_TEMP_NAME = "/gcode.sqlite";
 static int32_t MAX_CH_A_LINE = 16;
-static float DIS_BT_CHS = 7;
-static float DIS_BT_LINE = 7;
+static float DIS_BT_CHS = 10;
+static float DIS_BT_LINE = 10;
 static float DEFAULT_MIN_Z = 0.5;
 static float DEFAULT_MAX_Z = 7.0;
 static float NEW_MIN_Z = -8.0;
@@ -38,51 +38,52 @@ void GcodeGenerator::sendData(const QString &data)
     QMetaObject::invokeMethod(this, "_handleData", Qt::QueuedConnection, Q_ARG(QString, data));
 }
 
-void GcodeGenerator::setSerialPort(const QSharedPointer<SerialPort>& serialPort)
-{
-    m_serialPort = serialPort;
-}
-
 void GcodeGenerator::penUp()
 {
     QString str;
     str.sprintf("G1G90 Z%.1fF8000", NEW_MIN_Z);
-    m_serialPort->write(str);
+    emit gcodeReady(str);
 }
 
 void GcodeGenerator::penDown()
 {
     QString str;
     str.sprintf("G1G90 Z%.3fF8000", NEW_MAX_Z);
-    m_serialPort->write(str);
+    emit gcodeReady(str);
 }
 
 void GcodeGenerator::xMoveLeft(float value)
 {
     QString str;
     str.sprintf("G21G91 X-%.3f F8000", value);
-    m_serialPort->write(str);
+    emit gcodeReady(str);
 }
 
 void GcodeGenerator::xMoveRight(float value)
 {
     QString str;
     str.sprintf("G21G91 X+%.3f F8000", value);
-    m_serialPort->write(str);
+    emit gcodeReady(str);
 }
 
 void GcodeGenerator::yMoveForward(float value)
 {
     QString str;
     str.sprintf("G21G91 Y+%.3f F8000", value);
-    m_serialPort->write(str);
+    emit gcodeReady(str);
 }
 
 void GcodeGenerator::yMoveBackwards(float value)
 {
     QString str;
     str.sprintf("G21G91 Y-%.3f F8000", value);
-    m_serialPort->write(str);
+    emit gcodeReady(str);
+}
+
+void GcodeGenerator::setOriginPoint()
+{
+    QString str = "G92 X0 Y0 Z0";
+    emit gcodeReady(str);
 }
 
 void GcodeGenerator::initDb()
@@ -187,7 +188,7 @@ void GcodeGenerator::_handleData(const QString &data)
         }
 
         penUp();
-        m_serialPort->write(newGcodeList);
+        emit gcodeListReady(newGcodeList);
 
         m_chLineIndex++;
         if (m_chLineIndex >= MAX_CH_A_LINE)
