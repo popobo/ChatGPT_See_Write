@@ -13,7 +13,7 @@ public:
     explicit GPTController(QObject *parent = nullptr);
     ~GPTController();
 
-    void request(const QString& imagePath);
+    void request(const QString& req);
 
 signals:
     void response(const QString& req);

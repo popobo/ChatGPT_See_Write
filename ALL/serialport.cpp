@@ -14,15 +14,15 @@ static bool firstTime = true;
 
 SerialPort::SerialPort()
 {
-    m_serialThread = new QThread();
-    this->moveToThread(m_serialThread);
-
-    connect(m_serialThread, &QThread::finished, m_serialThread, &QObject::deleteLater);
-    connect(m_serialThread, &QThread::finished, this, &QObject::deleteLater);
-
-    m_serialThread->start();
-
+    m_serialThread.start();
+    this->moveToThread(&m_serialThread);
     init();
+}
+
+SerialPort::~SerialPort()
+{
+    m_serialThread.quit();
+    m_serialThread.wait();
 }
 
 void SerialPort::init()

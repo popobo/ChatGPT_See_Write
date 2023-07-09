@@ -12,6 +12,7 @@
 #include "ocrcontroller.h"
 #include "gptcontroller.h"
 #include "serialport.h"
+#include "gcodegenerator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -91,6 +92,7 @@ private:
     GPTController* m_gptController = nullptr;
     QThread m_gptControllerThread;
 
-    SerialPort* m_serialPort = nullptr;
+    QSharedPointer<SerialPort> m_serialPort;
+    QScopedPointer<GcodeGenerator> m_gcodeGenerator;
 };
 #endif // MAINWINDOW_H

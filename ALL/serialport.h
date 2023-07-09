@@ -14,6 +14,8 @@ class SerialPort: public QObject
 public:
     SerialPort();
 
+    ~SerialPort();
+
     void init();
 
     void open();
@@ -39,7 +41,7 @@ private slots:
 private:
     QScopedPointer<QSerialPort> m_serialPort;
 
-    QThread* m_serialThread;
+    QThread m_serialThread;
 };
 
 #endif // SERIALPORT_H

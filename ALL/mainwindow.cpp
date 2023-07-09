@@ -18,8 +18,10 @@ MainWindow::~MainWindow()
 {
     m_cameraThread.quit();
     m_ocrControllerThread.quit();
+    m_gptControllerThread.quit();
     m_cameraThread.wait();
     m_ocrControllerThread.wait();
+    m_gptControllerThread.wait();
 }
 
 static void initButton(QPushButton* button, const QString& name, bool enable, int32_t maxWidth, int32_t maxHeight)
@@ -146,10 +148,14 @@ void MainWindow::moduleInit()
 
     m_gptControllerThread.start();
 
-    m_serialPort = new SerialPort();
+    m_gcodeGenerator.reset(new GcodeGenerator());
+    connect(m_gptController, &GPTController::response, m_gcodeGenerator.get(), &GcodeGenerator::sendData);
 
-    connect(m_serialButton, &QPushButton::clicked, m_serialPort, &SerialPort::open);
-    connect(m_serialPort, &SerialPort::opened, this, &MainWindow::_serialOpened);
+    m_serialPort.reset(new SerialPort());
+    connect(m_serialButton, &QPushButton::clicked, m_serialPort.get(), &SerialPort::open);
+    connect(m_serialPort.get(), &SerialPort::opened, this, &MainWindow::_serialOpened);
+
+    m_gcodeGenerator->setSerialPort(m_serialPort);
 }
 
 void MainWindow::_scanCameraFin(const QStringList &list)

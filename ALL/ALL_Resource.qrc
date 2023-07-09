@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/gcode_database">
+        <file>gcode.sqlite</file>
+    </qresource>
+</RCC>
